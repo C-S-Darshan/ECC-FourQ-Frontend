@@ -1,14 +1,12 @@
+// App.js
 import './App.css';
-import Authenticate from './Components/Authentication';
-import AccountProvider from './Context/AccountProvider';
+import React from "react";
+import ChatApp from './Components/ChatApp';
 
 function App() {
   return (
     <div className="App">
-      <AccountProvider>
-      <h1>Chat app based on FourQ ECC</h1>
-      <Authenticate/>
-      </AccountProvider>
+      <ChatApp/>
     </div>
   );
 }
