@@ -1,16 +1,32 @@
 // Authentication.js
 import React, { useState, useContext } from "react";
-/* import { AccountContext } from "../Context/AccountProvider"; */
 import { LoginContext } from "../Context/LoginContext";
+import CryptoJS from "crypto-js";
 
 function Authenticate() {
     const [clientName, setClientName] = useState('');
     const [clientPassword, setPassword] = useState('');
-   /* const { setAccount } = useContext(AccountContext); */
+    const [encryptedText, setEncryptedText] = useState('');
+    const [isAuthorized, setIsAuthosrised] = useState(true)
     const {setShowList} = useContext(LoginContext)
     const {setUsername} = useContext(LoginContext) 
 
+
+
+    function encryptData(data, key) {
+        const encrypted = CryptoJS.AES.encrypt(data, key, {
+          mode: CryptoJS.mode.ECB,
+          padding: CryptoJS.pad.Pkcs7
+        });
+      
+        console.log(encrypted.toString())
+        return encrypted.toString();
+      }
+
+    
+
     const authenticateUser = async () => {
+        setEncryptedText(encryptData(clientName, "YourSecretKey123"))
         try {
             const response = await fetch('http://localhost:8080/api/sendData', {
                 method: 'POST',
@@ -29,6 +45,9 @@ function Authenticate() {
                 setUsername(clientName);
                 setShowList(true);
             }
+            else{
+                setIsAuthosrised(false)
+            }
         } catch (error) {
             console.error('Error occurred during authentication:', error);
         }
@@ -42,7 +61,7 @@ function Authenticate() {
             <p>Enter your Password: </p>
             <input type="text" name="ClientPassword" id="CPassWord" placeholder="Password" onChange={(e) => setPassword(e.target.value)} /><br />
             <button onClick={authenticateUser}>Submit</button>
-            {/* {isAuthorized ? <p>Authorised, Please wait</p> : null} */}
+            {isAuthorized ? null : <p>Looks like you made a mistake entering your credentials<br/>Please try again</p>}
         </>
     );
 }
