@@ -10,8 +10,7 @@ function Authenticate() {
     const [isAuthorized, setIsAuthosrised] = useState(true)
     const {setShowList} = useContext(LoginContext)
     const {setUsername} = useContext(LoginContext) 
-
-
+    const {setUid} = useContext(LoginContext)
 
     function encryptData(data, key) {
         const encrypted = CryptoJS.AES.encrypt(data, key, {
@@ -43,7 +42,10 @@ function Authenticate() {
             console.log(data.Authorised);
             if (data.Authorised) {
                 setUsername(clientName);
+                setUid(data.Uid)
                 setShowList(true);
+                console.log(data.Uid)
+                
             }
             else{
                 setIsAuthosrised(false)
