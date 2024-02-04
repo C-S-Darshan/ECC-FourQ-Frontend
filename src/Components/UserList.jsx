@@ -84,8 +84,10 @@ function UserList() {
       <br/><br/>
       <button onClick={fetchUsers}>Get Users/Refesh User List</button>
       {users.length > 0 && users.map((user, index) => (
-                <UserListItem key={index} Uname={user.Uname} UserID={user.UserID} />
-            ))}
+      user.Uname !== username && 
+      <UserListItem user={user} />
+      ))}
+
     </div>
   );
 }
