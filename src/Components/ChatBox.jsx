@@ -1,28 +1,33 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { LoginContext } from '../Context/LoginContext';
 import Messages from "./Message";
 
 function ChatBox(){
     const [text, setText] = useState('');
-    const [textMessage, setTextMessage] = useState('')
+    const [messages, setMessages] = useState([]); // State to hold messages
     const { username, uid, person, ws, setWs, requestSender } = useContext(LoginContext);
 
-    ws.onmessage = (event) => {
-        const jsonData = JSON.parse(event.data);
-        console.log('Received JSON data:', jsonData);
-        if(jsonData.type === "Message"){
-            setTextMessage(jsonData)
-        } 
-        else{
-            console.log("how did we get here")
+    useEffect(() => {
+        // Set up WebSocket message event listener
+        if (ws) {
+            ws.onmessage = (event) => {
+                const jsonData = JSON.parse(event.data);
+                console.log('Received JSON data:', jsonData);
+                if(jsonData.type === "Message"){
+                    // Add the new message to the messages list
+                    setMessages(prevMessages => [...prevMessages, jsonData]);
+                } 
+                else {
+                    console.log("how did we get here")
+                }
+            };
         }
-        
-    };
+    }, [ws]); // Run effect only when ws changes
 
     const sendMessage = () => {
         // Check if the message is not empty and if the WebSocket object is defined
         if (text.trim() !== '' && ws) {
-            if (ws && ws.readyState === WebSocket.OPEN) {
+            if (ws.readyState === WebSocket.OPEN) {
                 // Create a JSON object with four fields
                 const dataToSend = {
                     type: "Message",
@@ -39,7 +44,7 @@ function ChatBox(){
                 setText('');
             } else {
                 console.log('WebSocket connection is not open');
-            } // Clear the message input field after sending
+            }
         }
     };
 
@@ -48,17 +53,20 @@ function ChatBox(){
             <h1>Hello {username}! Client ID {uid}, You have reached Chat box.</h1>
             <p>Not fully implemented yet still being built</p>
             <input
-                        type="text"
-                        value={text}
-                        onChange={(e) => setText(e.target.value)}
-                    />
-                    {/* Button to send the message */}
-                    <button onClick={sendMessage}>Send Message</button>
+                type="text"
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+            />
+            {/* Button to send the message */}
+            <button onClick={sendMessage}>Send Message</button>
             <div>
-                {textMessage?<Messages props = {textMessage}/>:null}
+                {/* Render each message separately */}
+                {messages.map((message, index) => (
+                    <Messages key={index} props={message} />
+                ))}
             </div>
         </>
     )
 }
 
-export default ChatBox 
+export default ChatBox;
