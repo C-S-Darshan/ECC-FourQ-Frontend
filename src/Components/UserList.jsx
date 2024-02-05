@@ -6,12 +6,11 @@ import ChatBox from './ChatBox';
 
 function UserList() {
     const [message, setMessage] = useState('');
-    const { username, uid, person } = useContext(LoginContext);
-    const [ws, setWs] = useState(null); // State to store the WebSocket object
+    const { username, uid, person, ws, setWs } = useContext(LoginContext);
     const [clientId, setClientId] = useState(''); // State to store the client identifier
     const [users, setUsers] = useState([]);
     const [Request, setRequest] = useState(false);
-    const [requestSender, setRequestSender] = useState('')
+    const {requestSender, setRequestSender} = useContext(LoginContext);
     const [chat, setChat] = useState(false);
 
     useEffect(() => {
@@ -35,6 +34,7 @@ function UserList() {
                 setRequest(true)
                 setRequestSender(jsonData.sender)
             } else if (jsonData.type === "Response" && jsonData.field3 === "Yes"){
+                setRequestSender(jsonData.sender)
                 setChat(true)
             }
             
@@ -68,6 +68,7 @@ function UserList() {
     }
 
     // Function to handle sending messages
+    /* remove this form here later */
     const sendMessage = () => {
         // Check if the message is not empty and if the WebSocket object is defined
         if (message.trim() !== '' && ws) {
@@ -78,7 +79,7 @@ function UserList() {
     };
 
     const sendRequest = (websocket, person) => {
-        console.log("function called");
+        console.log("Made a Request to talk");
         if (websocket && websocket.readyState === WebSocket.OPEN) {
             // Create a JSON object with four fields
             const dataToSend = {
@@ -99,7 +100,7 @@ function UserList() {
     };
 
     const sendResponse = (websocket) => {
-        console.log("function called");
+        console.log("accepted request");
         if (websocket && websocket.readyState === WebSocket.OPEN) {
             // Create a JSON object with four fields
             const dataToSend = {
