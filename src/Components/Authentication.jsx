@@ -10,13 +10,14 @@ const Inp = styled(TextField)`
 `
 
 const Wrapper = styled(Box)`
-    display:flex;
-    align-items: center;
     height: 100vh;
     width: 100%;
+    padding-top:100px;
 
 `
 const Login = styled(Box)`
+    background-color:#f0eaea;
+    color:black;
     border: solid 1px #bebebe;
     margin-top: 100px;
     height: 450px;
@@ -97,14 +98,14 @@ function Authenticate() {
         <Wrapper><Login>
             <h3>Please provide your details for Authentication</h3>
             <p>Enter your name: </p>
-            <TextField id="outlined-basic-name" label="Name" variant="outlined" onChange={(e) => setClientName(e.target.value)} /> 
+            <TextField id="outlined-basic-name" label="Name" variant="standard" onChange={(e) => setClientName(e.target.value)} /> 
             {/* <input type="text" name="ClientName" id="CName" placeholder="Name" onChange={(e) => setClientName(e.target.value)} /><br /> */}
             <p>Enter your Password: </p>
             {/* <input type="text" name="ClientPassword" id="CPassWord" placeholder="Password" onChange={(e) => setPassword(e.target.value)} /><br />  */}
-            <TextField id="outlined-basic" label="Password" variant="outlined" onChange={(e) => setPassword(e.target.value)} /><br/>
+            <TextField id="outlined-basic" label="Password" variant="standard" onChange={(e) => setPassword(e.target.value)} /><br/>
             {/* <button onClick={authenticateUser}>Submit</button> */}
             <br/><br/>
-            <Button variant="outlined" onClick={authenticateUser}>Authenticate</Button>
+            <Button variant="contained" onClick={authenticateUser}>Authenticate</Button>
             </Login>
             {isAuthorized ? null : <p>Looks like you made a mistake entering your credentials<br/>Please try again</p>}
             </Wrapper>

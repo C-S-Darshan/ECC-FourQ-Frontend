@@ -6,7 +6,10 @@ import ChatBox from './ChatBox';
 import {Box,Button, styled} from '@mui/material'
 
 const Container = styled(Box)`
-    margin-top:130px;
+    padding-top:100px;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
 `
 
 const UserContainer = styled(Box)`
@@ -161,7 +164,7 @@ function UserList() {
                     <br />
                     {/* <button onClick={fetchUsers}>Get Users/Refesh User List</button> */}
                     <h3>User List</h3>
-                    <Button variant="outlined" onClick={fetchUsers}>Refresh User List</Button>
+                    <Button variant="contained" onClick={fetchUsers}>Refresh User List</Button>
                     <UserContainer>
                     {users.length > 0 && users.map((user, index) => (
                         user.Username !== username &&
@@ -169,8 +172,11 @@ function UserList() {
                     ))}
                     </UserContainer>
                     {/* <button onClick={() => sendRequest(ws, person)}>Chat with {person.Username}</button> */}
-                    <Button variant="outlined" onClick={() => sendRequest(ws, person)}>Chat with {person.Username}</Button>
-                    {Request ? <button onClick={() => sendResponse(ws)}>Accept Messages from Client ID{requestSender}</button> : null}
+                    <Button variant="contained" onClick={() => sendRequest(ws, person)}>Chat with {person.Username}</Button>
+                    <br/><br/>
+                    {Request ? 
+                    <Button variant="contained" onClick={() => sendResponse(ws)}>Accept Messages from Client ID{requestSender}</Button>
+                    /* <button onClick={() => sendResponse(ws)}>Accept Messages from Client ID{requestSender}</button>  */: null}
                 </Container>
             }
         </>

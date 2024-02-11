@@ -4,7 +4,7 @@ import {Box, styled} from '@mui/material'
 const UserBlock = styled(Box)`
     height: 100px;
     width: 300px;
-    border: solid 1px black;
+    border: solid 1px #bebebe;
     margin-bottom: 5px;
     border-radius: 10px;
     padding-top:6px;

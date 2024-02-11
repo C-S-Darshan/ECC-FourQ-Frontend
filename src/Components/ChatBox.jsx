@@ -1,6 +1,23 @@
 import React, { useState, useContext, useEffect } from "react";
 import { LoginContext } from '../Context/LoginContext';
 import Messages from "./Message";
+import {Box, Button, styled} from '@mui/material'
+
+const Container = styled(Box)`
+    padding-top:100px;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+`
+const MessageContainer = styled(Box)`
+    height:500px;
+    width:1200px;
+    border: solid 1px #bebebe;
+    margin-left: auto;
+    margin-right:auto;
+    border-radius:16px;
+    margin-top:50px;
+`
 
 function ChatBox(){
     const [text, setText] = useState('');
@@ -50,21 +67,26 @@ function ChatBox(){
 
     return(
         <>
-            <h1>Hello {username}! Client ID {uid}, You have reached Chat box.</h1>
-            <p>Not fully implemented yet still being built</p>
+            <Container>
+            <h2>Hello {username}! Client ID {uid}, You have reached Chat box.</h2>
+            {/* <p>Not fully implemented yet still being built</p> */}
             <input
                 type="text"
                 value={text}
                 onChange={(e) => setText(e.target.value)}
             />
             {/* Button to send the message */}
-            <button onClick={sendMessage}>Send Message</button>
-            <div>
+            {/* <button onClick={sendMessage}>Send Message</button> */}
+            <br/>
+            <br/>
+            <Button variant="contained" onClick={sendMessage}> Send Message</Button>
+            <MessageContainer>
                 {/* Render each message separately */}
                 {messages.map((message, index) => (
                     <Messages key={index} props={message} />
                 ))}
-            </div>
+            </MessageContainer>
+            </Container>
         </>
     )
 }
