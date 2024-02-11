@@ -10,7 +10,7 @@ function UserListItem({ user}) {
 
     return (
         <div onClick={initializePerson}>
-            User ID: {user.UserID}, Username: {user.Uname}
+            User ID: {user.ID}, Username: {user.Username}, Status: {user.UserStatus}
         </div>
     );
 }

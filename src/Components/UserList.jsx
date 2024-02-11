@@ -47,6 +47,7 @@ function UserList() {
 
         // Store the WebSocket object in state
         setWs(websocket);
+        fetchUsers()
 
         // Clean up function to close the WebSocket connection when the component unmounts
         return () => {
@@ -85,7 +86,7 @@ function UserList() {
             const dataToSend = {
                 type: "Request",
                 sender: uid,
-                receiver: person.UserID,
+                receiver: person.ID,
                 field3: " "
             };
 
@@ -140,10 +141,10 @@ function UserList() {
                     <br /><br />
                     <button onClick={fetchUsers}>Get Users/Refesh User List</button>
                     {users.length > 0 && users.map((user, index) => (
-                        user.Uname !== username &&
+                        user.Username !== username &&
                         <UserListItem key={index} user={user} />
                     ))}
-                    <button onClick={() => sendRequest(ws, person)}>Chat with {person.Uname}</button>
+                    <button onClick={() => sendRequest(ws, person)}>Chat with {person.Username}</button>
                     {Request ? <button onClick={() => sendResponse(ws)}>Accept Messages from Client ID{requestSender}</button> : null}
                 </div>
             }

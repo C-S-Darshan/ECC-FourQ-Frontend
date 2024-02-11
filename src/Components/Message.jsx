@@ -7,9 +7,9 @@ function Messages({props}){
     return(
         <>
         <div>
-            <p>{props.field3}</p>
-            <p>{props.sender}</p>
-            <p>{props.receiver}</p>
+            <p>Message : {props.field3}</p>
+            <p>Sent by : {props.sender}</p>
+            <p>Received by : {props.receiver}</p>
         </div>
         </>
     )
