@@ -3,6 +3,27 @@ import React, { useContext, useEffect, useState } from 'react';
 import { LoginContext } from '../Context/LoginContext';
 import UserListItem from './UserListItem';
 import ChatBox from './ChatBox';
+import {Box,Button, styled} from '@mui/material'
+
+const Container = styled(Box)`
+    margin-top:130px;
+`
+
+const UserContainer = styled(Box)`
+    height: 370px;
+    width: 350px;
+    padding:25px;
+    margin-left:auto;
+    margin-right:auto;
+    margin-top:20px;
+    margin-bottom:20px;
+    border-radius:16px;
+    display:flex;
+    align-items:center;
+    flex-direction: column;
+    
+
+`
 
 function UserList() {
     const [message, setMessage] = useState('');
@@ -126,27 +147,31 @@ function UserList() {
     return (
         <>
             {chat ? <ChatBox /> :
-                <div>
-                    <h1>User List</h1>
-                    <p>Welcome {username}!, Click on the users below to select the user to start texting</p>
+                <Container>
+                    <h2>Welcome {username}!, Click on the users below to select the user to start texting</h2>
                     <p>Client ID: {uid}</p>
                     {/* Input field to type the message */}
-                    <input
+                    {/* <input
                         type="text"
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                     />
                     {/* Button to send the message */}
-                    <button onClick={sendMessage}>Send Message</button>
-                    <br /><br />
-                    <button onClick={fetchUsers}>Get Users/Refesh User List</button>
+                    {/*<button onClick={sendMessage}>Send Message</button> */}
+                    <br />
+                    {/* <button onClick={fetchUsers}>Get Users/Refesh User List</button> */}
+                    <h3>User List</h3>
+                    <Button variant="outlined" onClick={fetchUsers}>Refresh User List</Button>
+                    <UserContainer>
                     {users.length > 0 && users.map((user, index) => (
                         user.Username !== username &&
                         <UserListItem key={index} user={user} />
                     ))}
-                    <button onClick={() => sendRequest(ws, person)}>Chat with {person.Username}</button>
+                    </UserContainer>
+                    {/* <button onClick={() => sendRequest(ws, person)}>Chat with {person.Username}</button> */}
+                    <Button variant="outlined" onClick={() => sendRequest(ws, person)}>Chat with {person.Username}</Button>
                     {Request ? <button onClick={() => sendResponse(ws)}>Accept Messages from Client ID{requestSender}</button> : null}
-                </div>
+                </Container>
             }
         </>
     );

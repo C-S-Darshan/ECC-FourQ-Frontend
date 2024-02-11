@@ -2,6 +2,11 @@ import React, { useState} from "react";
 import UserList from "./UserList";
 import Authenticate from "./Authentication";
 import { LoginContext } from "../Context/LoginContext";
+import { AppBar, Toolbar, styled } from "@mui/material";
+
+const Header = styled(AppBar)`
+    
+`
 
 function ChatApp(){
     const [username, setUsername] = useState("")
@@ -14,7 +19,11 @@ function ChatApp(){
 
     return(
         <LoginContext.Provider value={{username,setUsername,setShowList,setUid, uid,person,setPerson,ws,setWs,requestSender,setRequestSender}}>
-        <h1>Chat app based on FourQ ECC</h1>
+            <Header>
+                <Toolbar>
+                    <h1>Chat app based on FourQ ECC</h1>
+                </Toolbar>    
+            </Header>
         {(showList)?<UserList/>:<Authenticate/>}
         </LoginContext.Provider>
     )

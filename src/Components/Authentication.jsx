@@ -2,6 +2,30 @@
 import React, { useState, useContext } from "react";
 import { LoginContext } from "../Context/LoginContext";
 import CryptoJS from "crypto-js";
+import {Box,Button, TextField, styled} from '@mui/material'
+
+const Inp = styled(TextField)`
+    color:#bebebe;
+    border:border: solid 1px #bebebe;
+`
+
+const Wrapper = styled(Box)`
+    display:flex;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+
+`
+const Login = styled(Box)`
+    border: solid 1px #bebebe;
+    margin-top: 100px;
+    height: 450px;
+    max-width: 350px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius:15px;
+
+`
 
 function Authenticate() {
     const [clientName, setClientName] = useState('');
@@ -70,13 +94,20 @@ function Authenticate() {
 
     return (
         <>
-            <p>Please provide your details for Authentication</p>
+        <Wrapper><Login>
+            <h3>Please provide your details for Authentication</h3>
             <p>Enter your name: </p>
-            <input type="text" name="ClientName" id="CName" placeholder="Name" onChange={(e) => setClientName(e.target.value)} /><br />
+            <TextField id="outlined-basic-name" label="Name" variant="outlined" onChange={(e) => setClientName(e.target.value)} /> 
+            {/* <input type="text" name="ClientName" id="CName" placeholder="Name" onChange={(e) => setClientName(e.target.value)} /><br /> */}
             <p>Enter your Password: </p>
-            <input type="text" name="ClientPassword" id="CPassWord" placeholder="Password" onChange={(e) => setPassword(e.target.value)} /><br />
-            <button onClick={authenticateUser}>Submit</button>
+            {/* <input type="text" name="ClientPassword" id="CPassWord" placeholder="Password" onChange={(e) => setPassword(e.target.value)} /><br />  */}
+            <TextField id="outlined-basic" label="Password" variant="outlined" onChange={(e) => setPassword(e.target.value)} /><br/>
+            {/* <button onClick={authenticateUser}>Submit</button> */}
+            <br/><br/>
+            <Button variant="outlined" onClick={authenticateUser}>Authenticate</Button>
+            </Login>
             {isAuthorized ? null : <p>Looks like you made a mistake entering your credentials<br/>Please try again</p>}
+            </Wrapper>
         </>
     );
 }
