@@ -17,6 +17,7 @@ const MessageContainer = styled(Box)`
     margin-right:auto;
     border-radius:16px;
     margin-top:50px;
+    margin-bottom:50px;
 `
 
 function ChatBox(){
@@ -70,22 +71,25 @@ function ChatBox(){
             <Container>
             <h2>Hello {username}! Client ID {uid}, You have reached Chat box.</h2>
             {/* <p>Not fully implemented yet still being built</p> */}
-            <input
-                type="text"
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-            />
+            
             {/* Button to send the message */}
             {/* <button onClick={sendMessage}>Send Message</button> */}
-            <br/>
-            <br/>
-            <Button variant="contained" onClick={sendMessage}> Send Message</Button>
+            
+            
             <MessageContainer>
                 {/* Render each message separately */}
                 {messages.map((message, index) => (
                     <Messages key={index} props={message} />
                 ))}
             </MessageContainer>
+            <input
+                type="text"
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+            />
+            <br/>
+            <br/>
+            <Button variant="contained" onClick={sendMessage}> Send Message</Button>
             </Container>
         </>
     )

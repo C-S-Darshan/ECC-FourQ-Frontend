@@ -102,7 +102,7 @@ function Authenticate() {
             {/* <input type="text" name="ClientName" id="CName" placeholder="Name" onChange={(e) => setClientName(e.target.value)} /><br /> */}
             <p>Enter your Password: </p>
             {/* <input type="text" name="ClientPassword" id="CPassWord" placeholder="Password" onChange={(e) => setPassword(e.target.value)} /><br />  */}
-            <TextField id="outlined-basic" label="Password" variant="standard" onChange={(e) => setPassword(e.target.value)} /><br/>
+            <TextField type="password" id="outlined-basic" label="Password" variant="standard" onChange={(e) => setPassword(e.target.value)} /><br/>
             {/* <button onClick={authenticateUser}>Submit</button> */}
             <br/><br/>
             <Button variant="contained" onClick={authenticateUser}>Authenticate</Button>
