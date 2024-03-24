@@ -15,10 +15,11 @@ function ChatApp(){
     const [person, setPerson] = useState([])
     const [ws, setWs] = useState(null);
     const [requestSender, setRequestSender] = useState('')
+    const [sharedKey, setSharedKey] = useState("")
 
 
     return(
-        <LoginContext.Provider value={{username,setUsername,setShowList,setUid, uid,person,setPerson,ws,setWs,requestSender,setRequestSender}}>
+        <LoginContext.Provider value={{username,setUsername,setShowList,setUid, uid,person,setPerson,ws,setWs,requestSender,setRequestSender,sharedKey,setSharedKey}}>
             <Header>
                 <Toolbar>
                     <h1>Chat app based on FourQ ECC</h1>

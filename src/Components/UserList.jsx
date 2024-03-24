@@ -1,123 +1,177 @@
-// UserList.js
 import React, { useContext, useEffect, useState } from 'react';
 import { LoginContext } from '../Context/LoginContext';
 import UserListItem from './UserListItem';
 import ChatBox from './ChatBox';
-import {Box,Button, styled} from '@mui/material'
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, styled } from '@mui/material';
+import CryptoJS from "crypto-js";
+
+
 
 const Container = styled(Box)`
-    padding-top:100px;
+    padding-top: 100px;
     align-items: center;
     height: 100vh;
     width: 100%;
-`
+`;
 
 const UserContainer = styled(Box)`
     height: 370px;
     width: 350px;
-    padding:25px;
-    margin-left:auto;
-    margin-right:auto;
-    margin-top:20px;
-    margin-bottom:20px;
-    border-radius:16px;
-    display:flex;
-    align-items:center;
+    padding: 25px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
     flex-direction: column;
-    
+`;
 
-`
+const CustomDialog = styled(Dialog)`
+    .MuiDialog-paper {
+        background-color: #333;
+    }
+`;
+
+const CustomDialogTitle = styled(DialogTitle)`
+    color: #fff;
+`;
+
+const CustomDialogContent = styled(DialogContent)`
+    padding: 20px;
+`;
+
+const CustomDialogActions = styled(DialogActions)`
+    justify-content: space-between;
+`;
+
+const AcceptButton = styled(Button)`
+    background-color: green;
+    color: #fff;
+`;
+
+const RejectButton = styled(Button)`
+    background-color: red;
+    color: #fff;
+`;
 
 function UserList() {
     const [message, setMessage] = useState('');
-    const { username, uid, person, ws, setWs } = useContext(LoginContext);
-    const [clientId, setClientId] = useState(''); // State to store the client identifier
+    const { username, uid, person, ws, setWs} = useContext(LoginContext);
+    const [clientId, setClientId] = useState('');
     const [users, setUsers] = useState([]);
-    const [Request, setRequest] = useState(false);
-    const {requestSender, setRequestSender} = useContext(LoginContext);
+    const [request, setRequest] = useState(false);
+    const { requestSender, setRequestSender } = useContext(LoginContext);
     const [chat, setChat] = useState(false);
+    const [openRequestDialog, setOpenRequestDialog] = useState(false);
+    const [requestDialogContent, setRequestDialogContent] = useState('');
+    const [openRejectedDialog, setOpenRejectedDialog] = useState(false);
+    const {sharedKey, setSharedKey} = useContext(LoginContext);
+
+    function decryptAES(encryptedTextBase64, key) {
+        try {
+            // Convert the Base64 encoded ciphertext to a WordArray
+            const encryptedTextWordArray = CryptoJS.enc.Base64.parse(encryptedTextBase64);
+    
+            // Convert the key to a WordArray
+            const keyHex = CryptoJS.enc.Utf8.parse(key);
+    
+            // Decrypt the ciphertext using AES and ECB mode
+            const decrypted = CryptoJS.AES.decrypt(
+                { ciphertext: encryptedTextWordArray },
+                keyHex,
+                { mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.Pkcs7 }
+            );
+    
+            // Convert the decrypted data to a string
+            return decrypted.toString(CryptoJS.enc.Utf8);
+        } catch (error) {
+            console.error("Decryption error:", error.message);
+            return null;
+        }
+    }
 
     useEffect(() => {
-        // Establish WebSocket connection when the component mounts
         const websocket = new WebSocket('ws://localhost:8088/ws/RegisterClient');
 
-        // Event listener for connection open
         websocket.onopen = () => {
             console.log('WebSocket connected');
-
-            // Send username and uid to the backend on first-time connection
             const initialMessage = JSON.stringify({ username: username, uid: uid });
             websocket.send(initialMessage);
         };
 
-        // Event listener for receiving messages
         websocket.onmessage = (event) => {
             const jsonData = JSON.parse(event.data);
             console.log('Received JSON data:', jsonData);
-            if(jsonData.type === "Request"){
-                setRequest(true)
-                setRequestSender(jsonData.sender)
-            } else if (jsonData.type === "Response" && jsonData.field3 === "Yes"){
-                setRequestSender(jsonData.sender)
-                setChat(true)
+            if (jsonData.type === "Request") {
+                setRequest(true);
+                setRequestSender(jsonData.sender);
+                setRequestDialogContent(`Request from ${jsonData.sender} to chat.`);
+                setOpenRequestDialog(true);
+            } else if (jsonData.type === "Response") {
+                if (jsonData.field3 === "Yes") {
+                    var ensk = jsonData.field4;
+                    const key = "16bytesecretkey!";
+                    console.log(ensk);
+                    const decryptedText = decryptAES(ensk, key);
+                    console.log(decryptedText);
+                    setSharedKey(decryptedText);
+                    console.log(sharedKey);
+                    console.log(sharedKey);
+                    console.log(sharedKey);
+                    setRequestSender(jsonData.sender !== uid ? jsonData.sender : jsonData.receiver);
+                    setChat(true);
+                } else if (jsonData.field3 === "No") {
+                    setOpenRejectedDialog(true);
+                }
             }
-            
         };
 
-        // Event listener for connection close
         websocket.onclose = () => {
             console.log('WebSocket disconnected');
         };
 
-        // Store the WebSocket object in state
         setWs(websocket);
-        fetchUsers()
+        fetchUsers();
 
-        // Clean up function to close the WebSocket connection when the component unmounts
         return () => {
             websocket.close();
         };
-    }, []); // Empty dependency array ensures that this effect runs only once, when the component mounts
+    }, []);
+
 
     async function fetchUsers() {
         try {
-            const response = await fetch('http://localhost:8080/api/getUsers'); // Replace this with your endpoint
+            const response = await fetch('http://localhost:8080/api/getUsers');
             const data = await response.json();
-            var d = JSON.parse(data)
+            var d = JSON.parse(data);
             setUsers(d);
             console.log(users);
-            console.log(typeof(users))
+            console.log(typeof(users));
         } catch (error) {
             console.error('Error fetching users:', error);
         }
     }
 
-    // Function to handle sending messages
-    /* remove this form here later */
     const sendMessage = () => {
-        // Check if the message is not empty and if the WebSocket object is defined
         if (message.trim() !== '' && ws) {
-            // Send the message to the WebSocket server
             ws.send(message);
-            setMessage(''); // Clear the message input field after sending
+            setMessage('');
         }
     };
 
     const sendRequest = (websocket, person) => {
         console.log("Made a Request to talk");
+        console.log(person);
         if (websocket && websocket.readyState === WebSocket.OPEN) {
-            // Create a JSON object with four fields
             const dataToSend = {
                 type: "Request",
                 sender: uid,
                 receiver: person.ID,
                 field3: " "
             };
-
-            // Convert the JSON object to a JSON string
             const jsonData = JSON.stringify(dataToSend);
-
-            // Send the JSON string to the backend through the WebSocket connection
             websocket.send(jsonData);
         } else {
             console.log('WebSocket connection is not open');
@@ -127,58 +181,77 @@ function UserList() {
     const sendResponse = (websocket) => {
         console.log("accepted request");
         if (websocket && websocket.readyState === WebSocket.OPEN) {
-            // Create a JSON object with four fields
             const dataToSend = {
                 type: "Response",
                 sender: uid,
                 receiver: requestSender,
                 field3: "Yes"
             };
-
-            // Convert the JSON object to a JSON string
             const jsonData = JSON.stringify(dataToSend);
-
-            // Send the JSON string to the backend through the WebSocket connection
             websocket.send(jsonData);
-            setRequest(false)
-            setChat(true)
+            setRequest(false);
+            /* setChat(true); */
         } else {
             console.log('WebSocket connection is not open');
         }
     };
 
+    const handleRejectRequest = () => {
+        setOpenRequestDialog(false);
+        if (ws) {
+            const dataToSend = {
+                type: "Response",
+                sender: uid,
+                receiver: requestSender,
+                field3: "No"
+            };
+            const jsonData = JSON.stringify(dataToSend);
+            ws.send(jsonData);
+        }
+    };
+
+    const handleAcceptRequest = () => {
+        setOpenRequestDialog(false);
+        sendResponse(ws);
+    };
+
     return (
         <>
-            {chat ? <ChatBox /> :
+            {chat ? (
+                <ChatBox />
+            ) : (
                 <Container>
                     <h2>Welcome {username}!, Click on the users below to select the user to start texting</h2>
                     <p>Client ID: {uid}</p>
-                    {/* Input field to type the message */}
-                    {/* <input
-                        type="text"
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                    />
-                    {/* Button to send the message */}
-                    {/*<button onClick={sendMessage}>Send Message</button> */}
                     <br />
-                    {/* <button onClick={fetchUsers}>Get Users/Refesh User List</button> */}
                     <h3>User List</h3>
                     <Button variant="contained" onClick={fetchUsers}>Refresh User List</Button>
                     <UserContainer>
-                    {users.length > 0 && users.map((user, index) => (
-                        user.Username !== username &&
-                        <UserListItem key={index} user={user} />
-                    ))}
+                        {users.length > 0 && users.map((user, index) => (
+                            user.Username !== username &&
+                            <UserListItem key={index} user={user} />
+                        ))}
                     </UserContainer>
-                    {/* <button onClick={() => sendRequest(ws, person)}>Chat with {person.Username}</button> */}
                     <Button variant="contained" onClick={() => sendRequest(ws, person)}>Chat with {person.Username}</Button>
-                    <br/><br/>
-                    {Request ? 
-                    <Button variant="contained" onClick={() => sendResponse(ws)}>Accept Messages from Client ID{requestSender}</Button>
-                    /* <button onClick={() => sendResponse(ws)}>Accept Messages from Client ID{requestSender}</button>  */: null}
+                    <br /><br />
+                    {request ?
+                        <Button variant="contained" onClick={() => sendResponse(ws)}>Accept Messages from Client ID {requestSender}</Button>
+                        : null}
+                    <CustomDialog open={openRequestDialog} onClose={() => setOpenRequestDialog(false)}>
+                        <CustomDialogTitle>{requestDialogContent}</CustomDialogTitle>
+                        <CustomDialogActions>
+                            <RejectButton variant="contained" onClick={handleRejectRequest}>Reject</RejectButton>
+                            <AcceptButton variant="contained" onClick={handleAcceptRequest}>Accept</AcceptButton>
+                        </CustomDialogActions>
+                    </CustomDialog>
+                    <CustomDialog open={openRejectedDialog} onClose={() => setOpenRejectedDialog(false)}>
+                        <CustomDialogTitle>The other user has rejected the request to talk.</CustomDialogTitle>
+                        <CustomDialogActions>
+                            <Button variant="contained" onClick={() => setOpenRejectedDialog(false)}>Close</Button>
+                        </CustomDialogActions>
+                    </CustomDialog>
                 </Container>
-            }
+            )}
         </>
     );
 }

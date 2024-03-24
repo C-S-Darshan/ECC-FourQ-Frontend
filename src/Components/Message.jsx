@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { LoginContext } from '../Context/LoginContext';
 import { Box, styled } from '@mui/material';
+import CryptoJS from "crypto-js";
 
 const MessageComponent = styled(Box)`
     height: 60px;
@@ -13,14 +14,22 @@ const MessageComponent = styled(Box)`
 `;
 
 function Messages({ props }) {
-    const { uid } = useContext(LoginContext);
-
+    const { uid , sharedKey} = useContext(LoginContext);
+    function decryptAES(encryptedText, key) {
+        const keyHex = CryptoJS.enc.Hex.parse(key);
+        const decrypted = CryptoJS.AES.decrypt(encryptedText, keyHex, {
+            mode: CryptoJS.mode.ECB,
+            padding: CryptoJS.pad.Pkcs7
+        });
+        return decrypted.toString(CryptoJS.enc.Utf8);
+    }
     // Determine if the current user is the sender
     const isSender = props.sender === uid;
+    const decrypted = decryptAES(props.field3, sharedKey);
 
     return (
         <MessageComponent isSender={isSender}>
-            <p>Message: {props.field3}</p>
+            <p>Message: {decrypted}</p>
             <p>Sent by: {props.sender} Received by: {props.receiver}</p>
         </MessageComponent>
     );

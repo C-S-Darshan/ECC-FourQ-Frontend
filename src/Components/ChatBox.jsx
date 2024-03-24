@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import { LoginContext } from '../Context/LoginContext';
 import Messages from "./Message";
 import {Box, Button, styled} from '@mui/material'
+import CryptoJS from "crypto-js";
 
 const Container = styled(Box)`
     padding-top:100px;
@@ -23,7 +24,16 @@ const MessageContainer = styled(Box)`
 function ChatBox(){
     const [text, setText] = useState('');
     const [messages, setMessages] = useState([]); // State to hold messages
-    const { username, uid, person, ws, setWs, requestSender } = useContext(LoginContext);
+    const { username, uid, person, ws, setWs, requestSender, sharedKey, setSharedKey } = useContext(LoginContext);
+
+    function encryptAES(text, key) {
+        const keyHex = CryptoJS.enc.Hex.parse(key);
+        const encrypted = CryptoJS.AES.encrypt(text, keyHex, {
+            mode: CryptoJS.mode.ECB,
+            padding: CryptoJS.pad.Pkcs7
+        });
+        return encrypted.toString();
+    }
 
     useEffect(() => {
         // Set up WebSocket message event listener
@@ -47,11 +57,12 @@ function ChatBox(){
         if (text.trim() !== '' && ws) {
             if (ws.readyState === WebSocket.OPEN) {
                 // Create a JSON object with four fields
+                const encrypted = encryptAES(text, sharedKey);
                 const dataToSend = {
                     type: "Message",
                     sender: uid,
                     receiver: requestSender,
-                    field3: text
+                    field3: encrypted
                 };
     
                 // Convert the JSON object to a JSON string
