@@ -94,7 +94,7 @@ function UserList() {
 
     useEffect(() => {
         const websocket = new WebSocket('ws://localhost:8088/ws/RegisterClient');
-
+        console.log("UserList Mounted")
         websocket.onopen = () => {
             console.log('WebSocket connected');
             const initialMessage = JSON.stringify({ username: username, uid: uid });
@@ -105,13 +105,17 @@ function UserList() {
             const jsonData = JSON.parse(event.data);
             console.log('Received JSON data:', jsonData);
             if (jsonData.type === "Request") {
+                console.log("Message recieved, Inside Request condition rn");
                 setRequest(true);
+                console.log(request);
                 setRequestSender(jsonData.sender);
                 setRequestDialogContent(`Request from ${jsonData.sender} to chat.`);
                 setOpenRequestDialog(true);
             } else if (jsonData.type === "Response") {
+                console.log("Message recieved, Inside Response condition rn");
                 if (jsonData.field3 === "Yes") {
                     var ensk = jsonData.field4;
+                    console.log("Message recieved, Inside Response with yes condition rn");
                     const key = "16bytesecretkey!";
                     console.log(ensk);
                     const decryptedText = decryptAES(ensk, key);
@@ -123,6 +127,7 @@ function UserList() {
                     setRequestSender(jsonData.sender !== uid ? jsonData.sender : jsonData.receiver);
                     setChat(true);
                 } else if (jsonData.field3 === "No") {
+                    console.log("Message recieved, Inside Response with No condition rn");
                     setOpenRejectedDialog(true);
                 }
             }
