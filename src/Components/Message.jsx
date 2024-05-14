@@ -29,8 +29,8 @@ function Messages({ props }) {
 
     return (
         <MessageComponent isSender={isSender}>
-            <p>Message: {decrypted}</p>
-            <p>Sent by: {props.sender} Received by: {props.receiver}</p>
+            <p>{decrypted}</p>
+            <p>{props.field4}</p>
         </MessageComponent>
     );
 }

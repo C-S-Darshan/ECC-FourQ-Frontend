@@ -34,6 +34,7 @@ function Authenticate() {
     const [encryptedUname, setEncryptedUname] = useState('');
     const [encryptedPass, setEncryptedPass] = useState('');
     const [isAuthorized, setIsAuthorised] = useState(true)
+    const [errMessage, setErrMessage] = useState('')
     const {setShowList} = useContext(LoginContext)
     const {setUsername} = useContext(LoginContext) 
     const {setUid} = useContext(LoginContext)
@@ -61,7 +62,7 @@ function Authenticate() {
         setEncryptedUname(encryptData(clientName, keys[0]));
         setEncryptedPass(encryptData(clientPassword, keys[0]));
         try {
-            const response = await fetch('http://localhost:8080/api/sendData', {
+            const response = await fetch('http://localhost:8080/api/sendData', {//
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -86,6 +87,12 @@ function Authenticate() {
                 setShowList(true);
                 console.log(data.Uid);
             } else {
+                if(data.Authorised===0){
+                    setErrMessage('You have already logged in.\n Kindly log out of your other session to proceed here.')
+                }
+                else if(data.Authorised===-1){
+                    setErrMessage('It appears there may have been an error in entering your credentials.\n Please double-check and attempt again.')
+                }
                 setIsAuthorised(false);
             }
         } catch (error) {
@@ -107,7 +114,7 @@ function Authenticate() {
             <br/><br/>
             <Button variant="contained" onClick={authenticateUser}>Authenticate</Button>
             </Login>
-            {isAuthorized ? null : <p>Looks like you made a mistake entering your credentials<br/>Please try again</p>}
+            {isAuthorized ? null : <p>{errMessage}</p>}
             </Wrapper>
         </>
     );

@@ -58,7 +58,7 @@ const RejectButton = styled(Button)`
 
 function UserList() {
     const [message, setMessage] = useState('');
-    const { username, uid, person, ws, setWs} = useContext(LoginContext);
+    const { username, uid, person, setPerson, ws, setWs} = useContext(LoginContext);
     const [clientId, setClientId] = useState('');
     const [users, setUsers] = useState([]);
     const [request, setRequest] = useState(false);
@@ -68,6 +68,7 @@ function UserList() {
     const [requestDialogContent, setRequestDialogContent] = useState('');
     const [openRejectedDialog, setOpenRejectedDialog] = useState(false);
     const {sharedKey, setSharedKey} = useContext(LoginContext);
+    const [requestSent, setRequestSent] = useState(false);
 
     function decryptAES(encryptedTextBase64, key) {
         try {
@@ -105,11 +106,11 @@ function UserList() {
             const jsonData = JSON.parse(event.data);
             console.log('Received JSON data:', jsonData);
             if (jsonData.type === "Request") {
-                console.log("Message recieved, Inside Request condition rn");
+                console.log("Message received, Inside Request condition rn");
                 setRequest(true);
                 console.log(request);
                 setRequestSender(jsonData.sender);
-                setRequestDialogContent(`Request from ${jsonData.sender} to chat.`);
+                setRequestDialogContent(`Request from Client ID: ${jsonData.sender} to chat.`);
                 setOpenRequestDialog(true);
             } else if (jsonData.type === "Response") {
                 console.log("Message recieved, Inside Response condition rn");
@@ -146,17 +147,23 @@ function UserList() {
     }, []);
 
 
-    async function fetchUsers() {
-        try {
-            const response = await fetch('http://localhost:8080/api/getUsers');
-            const data = await response.json();
-            var d = JSON.parse(data);
-            setUsers(d);
-            console.log(users);
-            console.log(typeof(users));
-        } catch (error) {
-            console.error('Error fetching users:', error);
-        }
+    function fetchUsers() {
+        fetch('http://localhost:8080/api/getUsers')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                var d = JSON.parse(data);
+                setUsers(d);
+                console.log(users);
+                console.log(typeof(users));
+            })
+            .catch(error => {
+                console.error('Error fetching users:', error);
+            });
     }
 
     const sendMessage = () => {
@@ -178,6 +185,7 @@ function UserList() {
             };
             const jsonData = JSON.stringify(dataToSend);
             websocket.send(jsonData);
+            setRequestSent(true);
         } else {
             console.log('WebSocket connection is not open');
         }
@@ -220,6 +228,14 @@ function UserList() {
         sendResponse(ws);
     };
 
+    const handleClosePopup = () => {
+        setPerson([]);
+    };
+
+    const handleCloseRequestSentPopup = () => {
+        setRequestSent(false);
+    };
+
     return (
         <>
             {chat ? (
@@ -227,7 +243,7 @@ function UserList() {
             ) : (
                 <Container>
                     <h2>Welcome {username}!, Click on the users below to select the user to start texting</h2>
-                    <p>Client ID: {uid}</p>
+                    {/* <p>Client ID: {uid}</p> */}
                     <br />
                     <h3>User List</h3>
                     <Button variant="contained" onClick={fetchUsers}>Refresh User List</Button>
@@ -237,11 +253,38 @@ function UserList() {
                             <UserListItem key={index} user={user} />
                         ))}
                     </UserContainer>
-                    <Button variant="contained" onClick={() => sendRequest(ws, person)}>Chat with {person.Username}</Button>
+                    <CustomDialog open={person.length !== 0 && !requestSent} onClose={handleClosePopup}>
+                    <CustomDialogTitle>
+                        {person.UserStatus === 'offline' || person.UserStatus === 'busy'
+                            ? "Cannot send request to users who are offline/busy. Please try again later."
+                            : person.Username && `Send ${person.Username} a request to chat?`}
+                    </CustomDialogTitle>
+                    <CustomDialogContent>
+                        {person.UserStatus === 'offline' || person.UserStatus === 'busy' ? (
+                            <RejectButton variant="contained" onClick={handleClosePopup}>Ok</RejectButton>
+                        ) : (
+                            <CustomDialogActions>
+                                <RejectButton variant="contained" onClick={handleClosePopup}>Cancel</RejectButton>
+                                <AcceptButton variant="contained" onClick={() => {
+                                    sendRequest(ws, person);
+                                    handleClosePopup(); // Close the dialog after sending the request
+                                }}>Send Request</AcceptButton>
+                            </CustomDialogActions>
+                        )}
+                    </CustomDialogContent>
+                    </CustomDialog>
+
+                    <CustomDialog open={requestSent} onClose={handleCloseRequestSentPopup}>
+                        <CustomDialogTitle>Request sent successfully</CustomDialogTitle>
+                        <CustomDialogActions>
+                            <RejectButton variant="contained" onClick={handleCloseRequestSentPopup}>Ok</RejectButton>
+                        </CustomDialogActions>
+                    </CustomDialog>
+                    {/* <Button variant="contained" onClick={() => sendRequest(ws, person)}>Chat with {person.Username}</Button> */}
                     <br /><br />
-                    {request ?
-                        <Button variant="contained" onClick={() => sendResponse(ws)}>Accept Messages from Client ID {requestSender}</Button>
-                        : null}
+                    {/*request ?
+                        <Button variant="contained" onClick={() => sendResponse(ws)}>Accept Messages from Client ID {person.Username}</Button>
+                        : null*/}
                     <CustomDialog open={openRequestDialog} onClose={() => setOpenRequestDialog(false)}>
                         <CustomDialogTitle>{requestDialogContent}</CustomDialogTitle>
                         <CustomDialogActions>
@@ -261,4 +304,4 @@ function UserList() {
     );
 }
 
-export default UserList;
+export default UserList
