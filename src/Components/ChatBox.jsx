@@ -6,75 +6,88 @@ import { Box, Button, styled, Dialog, DialogTitle, DialogContent, DialogActions,
 import CryptoJS from "crypto-js";
 
 const Container = styled(Box)`
-    padding-top:100px;
+    padding-top: 35px;
     align-items: center;
     height: 100vh;
     width: 100%;
-`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+`;
 
 const MessageContainer = styled(Box)`
-    height:500px;
-    width:1200px;
+    height: 70vh;
+    width: 90%;
     border: solid 1px #bebebe;
-    margin-left: auto;
-    margin-right:auto;
-    border-radius:16px;
-    margin-top:50px;
-    margin-bottom:50px;
-`
+    border-radius: 16px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    overflow-y: auto; /* Add scrollbar if messages exceed container height */
+`;
 
 const ChatButton = styled(Button)`
     background: red;
     color: #fff;
-`
+`;
 
 const CustomDialogTitle = styled(DialogTitle)`
     background: #333;
     color: #fff;
-`
+`;
 
 const CustomDialogContent = styled(DialogContent)`
     background: #333;
     color: #fff;
-`
+`;
 
 const CustomDialogActions = styled(DialogActions)`
     background: #333;
-`
+`;
+
+const InputContainer = styled(Box)`
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px; /* Adjusted maximum width */
+    margin-top: 20px; /* Adjusted margin */
+`;
 
 const StyledTextField = styled(TextField)`
-    & .MuiOutlinedInput-root {
-        border-color: white; /* Change border color */
-        border-width: 2px; /* Increase border width */
-        border-radius: 10px; /* Add border radius */
-        width: 1000px;
-        margin-right:20px; /* Set width */
+    && {
+        flex: 1; /* Take up remaining space */
+        margin-right: 10px; /* Adjusted margin */
+        & .MuiOutlinedInput-root {
+            border-color: white; /* Change border color */
+            border-width: 2px; /* Increase border width */
+            border-radius: 10px; /* Add border radius */
+            width: 100%; /* Fill the remaining space */
+        }
+        & .MuiInputLabel-root {
+            color: white; /* Change label color */
+        }
+        & .MuiOutlinedInput-input {
+            color: white; /* Change input text color */
+        }
+        & .MuiOutlinedInput-notchedOutline {
+            border-color: white !important; /* Change outline border color */
+        }
     }
-    & .MuiInputLabel-root {
-        color: white; /* Change label color */
-    }
-    & .MuiOutlinedInput-input {
-        color: white; /* Change input text color */
-    }
-    & .MuiOutlinedInput-notchedOutline {
-        border-color: white !important; /* Change outline border color */
-    }
-`
-const StyledSendButton = styled(Button)`
-  && {
-    background-color: transparent;
-    color: white;
-    border: 2px solid white !important;
-    border-radius: 10px;
-    margin-left: 10px;
-    padding: 16px 20px;
-    height: 54px; /* Adjust height to match the text field */
-  }
+`;
 
-  &&:hover {
-    background-color: white;
-    color: black;
-  }
+const StyledSendButton = styled(Button)`
+    && {
+        background-color: transparent;
+        color: white;
+        border: 2px solid white;
+        border-radius: 10px;
+        padding: 14px 20px;
+        height: fit-content; /* Adjusted height */
+    }
+
+    &&:hover {
+        background-color: white;
+        color: black;
+    }
 `;
 
 function ChatBox() {
@@ -191,6 +204,7 @@ function ChatBox() {
                         <Message key={index} props={message} />
                     ))}
                 </MessageContainer>
+                <InputContainer>
                 <StyledTextField
                             variant="outlined"
                             value={text}
@@ -198,6 +212,7 @@ function ChatBox() {
                             placeholder="Enter your message..."
                 />
                 <StyledSendButton variant="contained" onClick={sendMessage}> Send Message</StyledSendButton><br/><br/><br/><br/>
+                </InputContainer>
                 <ChatButton variant="contained" onClick={handleDisconnect}>Leave chat</ChatButton> {/* Disconnect Button */}
             </Container>)
         }

@@ -8,20 +8,18 @@ import CryptoJS from "crypto-js";
 
 
 const Container = styled(Box)`
-    padding-top: 100px;
+    padding-top: 150px; /* Increased padding to push content down */
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     width: 100%;
+    overflow: hidden; /* Prevent scrollbar from appearing */
 `;
 
 const UserContainer = styled(Box)`
-    height: 370px;
-    width: 350px;
-    padding: 25px;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 20px;
-    margin-bottom: 20px;
+    height: auto; /* Allow height to adjust based on content */
+    max-width: 90%; /* Adjusted max-width for smaller screens */
+    padding: 20px; /* Reduced padding for smaller screens */
+    margin: 20px auto; /* Center align and provide space around the container */
     border-radius: 16px;
     display: flex;
     align-items: center;
@@ -31,6 +29,9 @@ const UserContainer = styled(Box)`
 const CustomDialog = styled(Dialog)`
     .MuiDialog-paper {
         background-color: #333;
+        width: 90%; /* Adjusted width for smaller screens */
+        max-width: 300px; /* Added max-width for smaller screens */
+        margin: 0 auto; /* Center align the dialog */
     }
 `;
 
@@ -49,11 +50,13 @@ const CustomDialogActions = styled(DialogActions)`
 const AcceptButton = styled(Button)`
     background-color: green;
     color: #fff;
+    min-width: 100px; /* Added min-width to prevent button from shrinking too much */
 `;
 
 const RejectButton = styled(Button)`
     background-color: red;
     color: #fff;
+    min-width: 100px; /* Added min-width to prevent button from shrinking too much */
 `;
 
 function UserList() {

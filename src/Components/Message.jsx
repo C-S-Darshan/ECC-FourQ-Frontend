@@ -4,13 +4,26 @@ import { Box, styled } from '@mui/material';
 import CryptoJS from "crypto-js";
 
 const MessageComponent = styled(Box)`
-    height: 60px;
-    max-width: 400px;
+    width: auto;
+    max-width: 80%; /* Adjusted max-width for mobile screens */
     color: #f0eaea;
     background-color: rgb(40, 142, 250);
     border-radius: 16px;
     margin: 20px;
+    padding: 10px; /* Added padding for better spacing */
     ${props => props.isSender ? 'margin-left: auto;' : 'margin-right: auto;'}
+
+    @media (min-width: 768px) { /* Adjusted for tablets and larger screens */
+        max-width: 50%;
+    }
+
+    @media (min-width: 992px) { /* Adjusted for desktops and larger screens */
+        max-width: 40%;
+    }
+
+    @media (min-width: 1200px) { /* Adjusted for larger desktop screens */
+        max-width: 30%;
+    }
 `;
 
 function Messages({ props }) {
